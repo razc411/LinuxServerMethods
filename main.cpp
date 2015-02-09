@@ -20,7 +20,11 @@ int main(int argc, char ** argv)
 	{
 		switch(c)
 		{
-			case 'm':
+			case 'e':
+                break;
+            case 't':
+                break;
+            case 'l':
                 break;
             default:
                 abort();

@@ -13,6 +13,7 @@
 				<Option compiler="clang" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -22,6 +23,7 @@
 				<Option compiler="clang" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -32,7 +34,15 @@
 			<Add option="-Weverything" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="Server.h" />
+		<Unit filename="ThreadPool.h" />
+		<Unit filename="include/EpollServer.h" />
+		<Unit filename="include/SelectServer.h" />
+		<Unit filename="include/ThreadServer.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/EpollServer.cpp" />
+		<Unit filename="src/SelectServer.cpp" />
+		<Unit filename="src/ThreadServer.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />
