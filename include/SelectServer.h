@@ -1,13 +1,13 @@
 #ifndef SELECTSERVER_H
 #define SELECTSERVER_H
 
-#include <Server.h>
+#include <../Server.h>
 
 
 class SelectServer : public Server
 {
     public:
-        SelectServer();
+        SelectServer(int s_port);
         ~SelectServer();
     protected:
     private:

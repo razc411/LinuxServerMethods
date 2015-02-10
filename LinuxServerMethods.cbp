@@ -10,8 +10,9 @@
 				<Option output="bin/Debug/LinuxServerMethods" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
-				<Option compiler="clang" />
+				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-std=c++0x" />
 					<Add option="-g" />
 					<Add directory="include" />
 				</Compiler>
@@ -20,9 +21,10 @@
 				<Option output="bin/Release/LinuxServerMethods" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
-				<Option compiler="clang" />
+				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-std=c++0x" />
 					<Add directory="include" />
 				</Compiler>
 				<Linker>
@@ -31,18 +33,13 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Weverything" />
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="Server.h" />
-		<Unit filename="ThreadPool.h" />
 		<Unit filename="include/EpollServer.h" />
-		<Unit filename="include/SelectServer.h" />
-		<Unit filename="include/ThreadServer.h" />
+		<Unit filename="include/ThreadPool.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/EpollServer.cpp" />
-		<Unit filename="src/SelectServer.cpp" />
-		<Unit filename="src/ThreadServer.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />

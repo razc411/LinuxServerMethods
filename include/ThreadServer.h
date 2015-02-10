@@ -1,13 +1,13 @@
 #ifndef THREADSERVER_H
 #define THREADSERVER_H
 
-#include <Server.h>
+#include <../Server.h>
 
 
 class ThreadServer : public Server
 {
     public:
-        ThreadServer();
+        ThreadServer(int s_port);
         virtual ~ThreadServer();
     protected:
     private:

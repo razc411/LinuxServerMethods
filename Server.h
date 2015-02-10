@@ -1,23 +1,39 @@
+#define HEADER_SIZE 4
+#include <errno.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <strings.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include "include/ThreadPool.h"
+
 class Server
 {
 public:
-    virtual ~Server() {}
-
+    Server(int s_port) : port(s_port) {}
+    ~Server() {}
     virtual void monitor_connections();
-    virtual int incoming_data();
-    virtual int send_echo();
-    virtual int s_exit();
+
 
     void set_port(int port)
     {
-        this.port = port;
+        this->port = port;
     }
 
-    void set_pool(ThreadPool th_Pool)
-    {
-        this.th_Pool = th_Pool
-    }
-private:
+protected:
     int port;
-    ThreadPool th_Pool;
+    //ThreadPool th_Pool;
+
+    virtual int incoming_data();
+    virtual void s_exit(int);
+    virtual int create_listener();
 };

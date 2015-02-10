@@ -1,5 +1,6 @@
 #include <iostream>
-#define OPTIONS "elt"
+#include <EpollServer.h>
+#define OPTIONS "e:l:t:"
 
 using namespace std;
 /**
@@ -16,20 +17,13 @@ int main(int argc, char ** argv)
 {
 	char c;
 
-	while((c = getopt(argc, argv, OPTIONS)) != -1)
-	{
-		switch(c)
-		{
-			case 'e':
-                break;
-            case 't':
-                break;
-            case 'l':
-                break;
-            default:
-                abort();
-		}
-	}
+	if((c = getopt(argc, argv, OPTIONS)) != -1)
+    if(c == 'e')
+    {
+        int port = atoi(optarg);
+        EpollServer eServer(port);
+        eServer.monitor_connections();
+    }
 
 	return 0;
 }

@@ -1,31 +1,31 @@
 #include "SelectServer.h"
 
-SelectServer::SelectServer()
+SelectServer::SelectServer(int s_port) : Server(s_port)
 {
-    //ctor
+
 }
 
 SelectServer::~SelectServer()
 {
-    //dtor
-}
-
-SelectServer::monitor_connections()
-{
 
 }
 
-SelectServer::incoming_data()
-{
-
-}
-
-SelectServer::send_echo()
-{
-
-}
-
-SelectServer::s_exit()
-{
-
-}
+//SelectServer::monitor_connections()
+//{
+//
+//}
+//
+//SelectServer::incoming_data()
+//{
+//
+//}
+//
+//SelectServer::send_echo()
+//{
+//
+//}
+//
+//SelectServer::s_exit()
+//{
+//
+//}
