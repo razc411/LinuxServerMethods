@@ -40,9 +40,10 @@
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */
-EpollServer::EpollServer(int s_port) : Server(s_port)
+EpollServer::EpollServer(int s_port) : port(s_port)
 {
     fd_server = create_listener();
+    pool = new ThreadPool(2);
 }
 /**
 *	Function: 	monitor_connections
@@ -68,17 +69,64 @@ EpollServer::~EpollServer()
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */
-void EpollServer::monitor_connections()
+void incoming_data(int fd)
 {
-    int num_fds, epoll_fd;
-    struct sockaddr_in remote_addr;
+    int	n, bytes_to_read, bytes_incoming;
+	char *bp, buf[BUFLEN];
+
+	while (1)
+	{
+		bp = buf;
+		bytes_to_read = HEADER_SIZE;
+		while ((n = recv (fd, bp, bytes_to_read, 0)) < bytes_to_read)
+		{
+			bp += n;
+			bytes_to_read -= n;
+		}
+
+        bytes_incoming = (int)*buf;
+        int echo_size = (int)*buf;
+        memset(buf, BUFLEN, 0);
+        bp = buf;
+
+		while ((n = recv (fd, bp, bytes_incoming, 0)) < bytes_incoming)
+		{
+			bp += n;
+			bytes_incoming -= n;
+		}
+
+		send (fd, buf, echo_size, 0);
+	}
+}
+
+/**
+*	Function: 	monitor_connections
+*	Author: 	Ramzi Chennafi
+*	Date:		Febuary 10 2015
+*	Returns:	void
+*
+*	Notes
+*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
+*   and responds accordingly. Manages listening, reading and writing.
+*/
+void EpollServer::monitor_connections(const char * type)
+{
+    int num_fds;
 
     if((epoll_fd = epoll_create(EPOLL_QUEUE_LEN)) == -1)
     {
         callError("Failure at epoll fd create.");
     }
 
-    event.events = EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLET;
+    if(strcmp(type, "EDGE"))
+    {
+        event.events = EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLET;
+    }
+    else
+    {
+        event.events = EPOLLIN | EPOLLERR | EPOLLHUP;
+    }
+
     event.data.fd = fd_server;
     if (epoll_ctl (epoll_fd, EPOLL_CTL_ADD, fd_server, &event) == -1)
     {
@@ -104,14 +152,19 @@ void EpollServer::monitor_connections()
 
             if (events[i].data.fd == fd_server)
             {
-                incoming_connection(&remote_addr);
+                incoming_connection();
                 continue;
             }
 
-            if (!incoming_data(events[i].data.fd))
+            int temp = events[i].data.fd;
+
+            if(strcmp(type, "EDGE") || strcmp(type, "LEVEL"))
             {
-                printf("Closing fd %d.\n", events[i].data.fd);
-                close(events[i].data.fd);
+                pool->enqueue(incoming_data, temp);
+            }
+            else
+            {
+                incoming_data(temp);
             }
         }
     }
@@ -133,7 +186,7 @@ int EpollServer::create_listener()
     struct sockaddr_in addr;
     int arg = 1;
 
-    if((fd_server = socket (AF_INET, SOCK_STREAM, 0)) = -1)
+    if((fd_server = socket (AF_INET, SOCK_STREAM, 0)) == -1)
     {
         callError("Failure at creating listener.");
     }
@@ -174,12 +227,13 @@ int EpollServer::create_listener()
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */
-void EpollServer::incoming_connection(struct sockaddr_in* remote_addr)
+void EpollServer::incoming_connection()
 {
     int fd_new;
+    struct sockaddr_in remote_addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
 
-    if ((fd_new = accept (fd_server, (struct sockaddr*)remote_addr, &addr_size)) == -1)
+    if ((fd_new = accept(fd_server, (struct sockaddr*)&remote_addr, &addr_size)) == -1)
     {
         if (errno != EAGAIN && errno != EWOULDBLOCK)
         {
@@ -187,60 +241,19 @@ void EpollServer::incoming_connection(struct sockaddr_in* remote_addr)
         }
     }
 
-    if (fcntl (fd_new, F_SETFL, O_NONBLOCK | fcntl(fd_new, F_GETFL, 0)) == -1)
+    if (fcntl(fd_new, F_SETFL, O_NONBLOCK | fcntl(fd_new, F_GETFL, 0)) == -1)
     {
         callError("Failure at fcntl.");
     }
     event.data.fd = fd_new;
 
-    if (epoll_ctl (epoll_fd, EPOLL_CTL_ADD, fd_new, &event) == -1)
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd_new, &event) == -1)
     {
-        perror("epoll_ctl new incoming");
+        printf("%d", errno);
+        callError("epoll_ctl new incoming");
     }
 
-    printf("Remote Address:  %s\n", inet_ntoa(remote_addr->sin_addr));
-}
-/**
-*	Function: 	monitor_connections
-*	Author: 	Ramzi Chennafi
-*	Date:		Febuary 10 2015
-*	Returns:	void
-*
-*	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
-*/
-int EpollServer::incoming_data(int fd)
-{
-    int	n, bytes_to_read, bytes_incoming;
-	char *bp, buf[BUFLEN];
-
-	while (1)
-	{
-		bp = buf;
-		bytes_to_read = BUFLEN;
-		while ((n = recv (fd, bp, bytes_to_read, 0)) < HEADER_SIZE)
-		{
-			bp += n;
-			bytes_to_read -= n;
-		}
-
-        bytes_incoming = (int)*buf;
-        memset(buf, BUFLEN, 0);
-        bp = buf;
-
-		while ((n = recv (fd, bp, bytes_to_read, 0)) < bytes_incoming)
-		{
-			bp += n;
-			bytes_to_read -= n;
-		}
-
-		send (fd, buf, BUFLEN, 0);
-		close (fd);
-		return 1;
-	}
-	close(fd);
-	return(0);
+    printf("Remote Address:  %s\n", inet_ntoa(remote_addr.sin_addr));
 }
 /**
 *	Function: 	monitor_connections
@@ -272,3 +285,4 @@ void EpollServer::callError(const char* error)
     perror(error);
     s_exit(1);
 }
+
