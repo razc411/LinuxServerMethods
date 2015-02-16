@@ -21,6 +21,7 @@
 #include <sys/epoll.h>
 #include <ThreadPool.h>
 #include <assert.h>
+#define BUFFER_SIZE 2048
 
 class EpollServer
 {

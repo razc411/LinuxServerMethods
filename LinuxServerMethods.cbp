@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-e 5001" />
+				<Option parameters="-l 5001" />
 				<Compiler>
 					<Add option="-std=c++11" />
 					<Add option="-g" />

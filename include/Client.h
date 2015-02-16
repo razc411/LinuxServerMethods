@@ -13,7 +13,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
-
+#include <cstring>
+#define BUFFER_SIZE 2048
 class Client
 {
     public:

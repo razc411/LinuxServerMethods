@@ -32,8 +32,9 @@ void Client::connect_client()
 		exit(1);
 	}
 	printf("Connected:    Server Name: %s\n", hp->h_name);
-
-    send_echo();
+    while(true){
+        send_echo();
+    }
 }
 
 void Client::send_echo()
@@ -47,7 +48,6 @@ void Client::send_echo()
     char rbuf[msg_size];
 
     printf("Sending Echo...");
-    send (sd, (char*)&msg_size, sizeof(int), 0);
     send (sd, input.c_str(), msg_size, 0);
 
 	printf("Receive:\n");
@@ -55,7 +55,7 @@ void Client::send_echo()
 	bytes_to_read = msg_size;
 
 	n = 0;
-	while ((n = recv (sd, bp, bytes_to_read, 0)) < input.length())
+	while ((n = recv (sd, bp, bytes_to_read, 0)) < msg_size)
 	{
 		bp += n;
 		bytes_to_read -= n;

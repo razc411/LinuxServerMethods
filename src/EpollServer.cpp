@@ -57,7 +57,7 @@ EpollServer::EpollServer(int s_port) : port(s_port)
 */
 EpollServer::~EpollServer()
 {
-    //dtor
+    delete [] pool;
 }
 /**
 *	Function: 	monitor_connections
@@ -71,30 +71,38 @@ EpollServer::~EpollServer()
 */
 void incoming_data(int fd)
 {
-    int	n, bytes_to_read, bytes_incoming;
-	char *bp, buf[BUFLEN];
+    int	n, bytes_read = 0;
+	char *bp, buf[BUFFER_SIZE];
 
-    bp = buf;
-    bytes_to_read = HEADER_SIZE;
-    while ((n = recv (fd, bp, bytes_to_read, 0)) < bytes_to_read)
-    {
-        bp += n;
-        bytes_to_read -= n;
-    }
-
-    bytes_incoming = (int)*buf;
-    int echo_size = (int)*buf;
-    memset(buf, BUFLEN, 0);
+    memset(buf, BUFFER_SIZE, 0);
     bp = buf;
 
-    while ((n = recv (fd, bp, bytes_incoming, 0)) < bytes_incoming)
+    while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
     {
         bp += n;
-        bytes_incoming -= n;
-    }
+        bytes_read += n;
 
-    send (fd, buf, echo_size, 0);
-    close(fd);
+        if(BUFFER_SIZE == bytes_read)
+        {
+            send (fd, buf, bytes_read, 0);
+            bytes_read = 0;
+            memset(buf, BUFFER_SIZE, 0);
+            bp = buf;
+        }
+    }
+    if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
+    {
+        send (fd, buf, bytes_read, 0);
+    }
+    else if (n == 0)
+    {
+        close(fd);
+    }
+    else
+    {
+        perror("Receive error");
+        close(fd);
+    }
 }
 
 /**
@@ -109,7 +117,7 @@ void incoming_data(int fd)
 */
 void EpollServer::monitor_connections(const char * type)
 {
-    int num_fds;
+    int num_fds = 0;
 
     if((epoll_fd = epoll_create(EPOLL_QUEUE_LEN)) == -1)
     {
@@ -147,7 +155,6 @@ void EpollServer::monitor_connections(const char * type)
                 close(events[i].data.fd);
                 continue;
             }
-            assert(events[i].events & EPOLLIN);
 
             if (events[i].data.fd == fd_server)
             {
@@ -157,9 +164,10 @@ void EpollServer::monitor_connections(const char * type)
 
             int temp = events[i].data.fd;
 
-            if(strcmp(type, "EDGE") || strcmp(type, "LEVEL"))
+            if(strcmp(type, "EDGE") == 0 || strcmp(type, "LEVEL") == 0)
             {
                 pool->enqueue(incoming_data, temp);
+                continue;
             }
             else
             {
