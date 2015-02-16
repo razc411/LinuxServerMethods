@@ -62,5 +62,4 @@ void Client::send_echo()
 	}
 
 	printf ("%s\n", rbuf);
-	close (sd);
 }

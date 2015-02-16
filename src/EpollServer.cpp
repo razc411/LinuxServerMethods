@@ -74,29 +74,27 @@ void incoming_data(int fd)
     int	n, bytes_to_read, bytes_incoming;
 	char *bp, buf[BUFLEN];
 
-	while (1)
-	{
-		bp = buf;
-		bytes_to_read = HEADER_SIZE;
-		while ((n = recv (fd, bp, bytes_to_read, 0)) < bytes_to_read)
-		{
-			bp += n;
-			bytes_to_read -= n;
-		}
+    bp = buf;
+    bytes_to_read = HEADER_SIZE;
+    while ((n = recv (fd, bp, bytes_to_read, 0)) < bytes_to_read)
+    {
+        bp += n;
+        bytes_to_read -= n;
+    }
 
-        bytes_incoming = (int)*buf;
-        int echo_size = (int)*buf;
-        memset(buf, BUFLEN, 0);
-        bp = buf;
+    bytes_incoming = (int)*buf;
+    int echo_size = (int)*buf;
+    memset(buf, BUFLEN, 0);
+    bp = buf;
 
-		while ((n = recv (fd, bp, bytes_incoming, 0)) < bytes_incoming)
-		{
-			bp += n;
-			bytes_incoming -= n;
-		}
+    while ((n = recv (fd, bp, bytes_incoming, 0)) < bytes_incoming)
+    {
+        bp += n;
+        bytes_incoming -= n;
+    }
 
-		send (fd, buf, echo_size, 0);
-	}
+    send (fd, buf, echo_size, 0);
+    close(fd);
 }
 
 /**
@@ -149,6 +147,7 @@ void EpollServer::monitor_connections(const char * type)
                 close(events[i].data.fd);
                 continue;
             }
+            assert(events[i].events & EPOLLIN);
 
             if (events[i].data.fd == fd_server)
             {

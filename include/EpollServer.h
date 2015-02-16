@@ -20,6 +20,7 @@
 #include <signal.h>
 #include <sys/epoll.h>
 #include <ThreadPool.h>
+#include <assert.h>
 
 class EpollServer
 {
