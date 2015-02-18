@@ -1,9 +1,4 @@
-#include "Client.h"
-
-Client::Client(int c_port, std::string host) : port(c_port), hostname(host)
-{
-    //ctor
-}
+#include "../include/Client.h"
 
 void Client::connect_client()
 {

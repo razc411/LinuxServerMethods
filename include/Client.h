@@ -14,11 +14,13 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+
 #define BUFFER_SIZE 2048
+
 class Client
 {
     public:
-        Client(int c_port, std::string hostname);
+        Client(int c_port, std::string host): port(c_port), hostname(host) {}
         ~Client() {};
         void connect_client();
     protected:

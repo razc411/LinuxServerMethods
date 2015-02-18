@@ -29,7 +29,7 @@
 *		-f arg - specifies the filename for the log.
 *
 */
-#include "EpollServer.h"
+#include "../include/EpollServer.h"
 /**
 *	Function: 	monitor_connections
 *	Author: 	Ramzi Chennafi
@@ -40,10 +40,10 @@
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */
-EpollServer::EpollServer(int s_port) : port(s_port)
+EpollServer::EpollServer(int s_port, int threads) : port(s_port)
 {
     fd_server = create_listener();
-    pool = new ThreadPool(2);
+    pool = new ThreadPool(threads);
 }
 /**
 *	Function: 	monitor_connections
@@ -105,26 +105,14 @@ void incoming_data(int fd)
     }
 }
 
-/**
-*	Function: 	monitor_connections
-*	Author: 	Ramzi Chennafi
-*	Date:		Febuary 10 2015
-*	Returns:	void
-*
-*	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
-*/
-void EpollServer::monitor_connections(const char * type)
+void EpollServer::setup_server(int type)
 {
-    int num_fds = 0;
-
     if((epoll_fd = epoll_create(EPOLL_QUEUE_LEN)) == -1)
     {
         callError("Failure at epoll fd create.");
     }
 
-    if(strcmp(type, "EDGE"))
+    if(type == EDGE_SERVER)
     {
         event.events = EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLET;
     }
@@ -138,6 +126,22 @@ void EpollServer::monitor_connections(const char * type)
     {
         callError("Failure at epoll_ctl epoll fd.");
     }
+}
+
+/**
+*	Function: 	monitor_connections
+*	Author: 	Ramzi Chennafi
+*	Date:		Febuary 10 2015
+*	Returns:	void
+*
+*	Notes
+*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
+*   and responds accordingly. Manages listening, reading and writing.
+*/
+void EpollServer::monitor_connections(int type)
+{
+    int num_fds = 0;
+    setup_server(type);
 
     while (1)
     {
@@ -151,7 +155,7 @@ void EpollServer::monitor_connections(const char * type)
         {
             if (events[i].events & (EPOLLHUP | EPOLLERR))
             {
-                fprintf(stderr, "epoll: EPOLLERR\n");
+                fprintf(stderr, "Connection Closed");
                 close(events[i].data.fd);
                 continue;
             }
@@ -164,7 +168,7 @@ void EpollServer::monitor_connections(const char * type)
 
             int temp = events[i].data.fd;
 
-            if(strcmp(type, "EDGE") == 0 || strcmp(type, "LEVEL") == 0)
+            if(type < LEVEL_SERVER_NO_THREAD)
             {
                 pool->enqueue(incoming_data, temp);
                 continue;
@@ -175,6 +179,7 @@ void EpollServer::monitor_connections(const char * type)
             }
         }
     }
+    
     close(fd_server);
     exit(0);
 }

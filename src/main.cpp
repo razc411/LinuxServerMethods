@@ -1,6 +1,6 @@
 #include <iostream>
-#include <EpollServer.h>
-#include <Client.h>
+#include "include/EpollServer.h"
+#include "include/Client.h"
 #define OPTIONS "e:l:t:c:"
 
 using namespace std;
@@ -24,20 +24,20 @@ int main(int argc, char ** argv)
 
         if(c == 'e')
         {
-            EpollServer eServer(port);
-            eServer.monitor_connections("EDGE");
+            EpollServer eServer(port, 2);
+            eServer.monitor_connections(EDGE_SERVER);
             break;
         }
         else if(c == 'l')
         {
-            EpollServer eServer(port);
-            eServer.monitor_connections("LEVEL");
+            EpollServer eServer(port, 2);
+            eServer.monitor_connections(LEVEL_SERVER);
             break;
         }
         else if(c == 't')
         {
-            EpollServer eServer(port);
-            eServer.monitor_connections("POLLING");
+            EpollServer eServer(port, 2);
+            eServer.monitor_connections(LEVEL_SERVER_NO_THREAD);
             break;
         }
         else if(c == 'c')
