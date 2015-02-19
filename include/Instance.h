@@ -1,5 +1,5 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef INSTANCE_H
+#define INSTANCE_H
 
 #include <string>
 #include <stdio.h>
@@ -15,21 +15,22 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+#include <thread>
 
 #define BUFFER_SIZE 2048
 
-class Client
+class Instance extends Thread
 {
-    public:
-        Client(int, std::string, int, int); 
-        ~Client() {};
-        void connect_clients();
-        void send_echo();
+public:
+		Instance(int port, std::string hostname, int data_size);
+		void run();
 
-    private:
+	private:
+		int sd;
+		int data_size;
 
-        std::string hostname;
-        std::vector client_list;
+		void send_echo();
+		int exit_instance();
 };
 
-#endif // CLIENT_H
+#endif // INSTANCE_H

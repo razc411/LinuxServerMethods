@@ -1,60 +1,29 @@
 #include "../include/Client.h"
 
-void Client::connect_client()
+Client::Client(int port, std::string hostname, int clients, int dsize) : clients(num_clients)
 {
-    struct hostent	*hp;
-	struct sockaddr_in server;
+	connect_clients(port, hostname, data_size);
+}
 
-	if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-	{
-		perror("Cannot create socket");
-		exit(1);
-	}
-	bzero((char *)&server, sizeof(struct sockaddr_in));
-	server.sin_family = AF_INET;
-	server.sin_port = htons(port);
-	if ((hp = gethostbyname(hostname.c_str())) == NULL)
-	{
-		fprintf(stderr, "Unknown server address\n");
-		exit(1);
-	}
-	bcopy(hp->h_addr, (char *)&server.sin_addr, hp->h_length);
-
-	if (connect(sd, (struct sockaddr *)&server, sizeof(server)) == -1)
-	{
-		fprintf(stderr, "Can't connect to server\n");
-		perror("connect");
-		exit(1);
-	}
-	printf("Connected:    Server Name: %s\n", hp->h_name);
+void Client::manage_clients()
+{ 
     while(true){
         send_echo();
     }
 }
 
-void Client::send_echo()
+void Client::connect_clients(int port, std::string hostname, int data_size)
 {
-    int n, bytes_to_read, msg_size;
-    std::string input = "ECHO REPLY ECHO REPLY KEEP DOING IT.";
-    char * bp;
-
-    msg_size = input.length();
-
-    char rbuf[msg_size];
-
-    printf("Sending Echo...");
-    send (sd, input.c_str(), msg_size, 0);
-
-	printf("Receive:\n");
-	bp = rbuf;
-	bytes_to_read = msg_size;
-
-	n = 0;
-	while ((n = recv (sd, bp, bytes_to_read, 0)) < msg_size)
+	for(int i = 0; i < clients; ++i)
 	{
-		bp += n;
-		bytes_to_read -= n;
+		Instance client = new Instance(port, hostname, data_size);
+		client_list.push_back(client);
 	}
 
-	printf ("%s\n", rbuf);
+	printf("%d clients created, connected to %s and ready to send a  %d bytes of data per second.", clients, hostname, data_size);
+}
+
+void Client::send_echo()
+{
+
 }
