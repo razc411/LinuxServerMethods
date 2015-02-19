@@ -1,9 +1,5 @@
 #include ../include/Instance.h
 
-Instance::Instance(int port, std::string hostname, int d_size) : port(port), hostname(host), data_size(d_size)
-{
-}
-
 void Instance::run()
 {
 	struct hostent	*hp;
@@ -43,12 +39,10 @@ void Instance::send_echo()
 
     memset(buffer, 1, data_size);
 
-    printf("Sending Echo...");
     send (sd, buffer, data_size, 0);
 
     memset(buffer, 0, data_size);
 
-	printf("Receive:\n");
 	bp = buffer;
 	bytes_to_read = data_size;
 
@@ -78,9 +72,4 @@ void Instance::send_echo()
 	}
 
 	sleep(1);
-}
-		
-int Instance::exit_instance()
-{
-
 }

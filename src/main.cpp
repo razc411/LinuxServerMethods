@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "include/EpollServer.h"
 #include "include/Client.h"
 #define OPTIONS "eltcp:h:t:"
@@ -64,7 +65,10 @@ int main(int argc, char ** argv)
         else if(c == 'c')
         {
             Client echo_client(port, hostname, clients, data_size);
-            echo_client.connect_client();
+            echo_client.connect_clients();
+            printf("Hit any key to begin transfer.")
+            std::getline(std::cin, 0)
+            echo_client.start_clients();
             break;
         }
     }

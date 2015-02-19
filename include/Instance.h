@@ -22,15 +22,15 @@
 class Instance extends Thread
 {
 public:
-		Instance(int port, std::string hostname, int data_size);
+		Instance::Instance(int sport, std::string hostname, int d_size) 
+			: port(sport), hostname(host), data_size(d_size) {};
 		void run();
+		void send_echo();
 
 	private:
-		int sd;
+		int sport;
+		std::string hostname;
 		int data_size;
-
-		void send_echo();
-		int exit_instance();
 };
 
 #endif // INSTANCE_H

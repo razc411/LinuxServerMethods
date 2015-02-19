@@ -5,10 +5,14 @@ Client::Client(int port, std::string hostname, int clients, int dsize) : clients
 	connect_clients(port, hostname, data_size);
 }
 
-void Client::manage_clients()
+void Client::start_clients()
 { 
-    while(true){
-        send_echo();
+    while(true)
+    {
+        for(int i = 0; i < clients; ++i)
+        {
+        	client_list[i].send_echo();
+        }
     }
 }
 
@@ -21,9 +25,4 @@ void Client::connect_clients(int port, std::string hostname, int data_size)
 	}
 
 	printf("%d clients created, connected to %s and ready to send a  %d bytes of data per second.", clients, hostname, data_size);
-}
-
-void Client::send_echo()
-{
-
 }
