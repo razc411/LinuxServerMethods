@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
             printf("Hit any key to begin transfer.")
             std::getline(std::cin, 0)
             echo_client.start_clients();
-            break;
+            break; 
         }
     }
 
