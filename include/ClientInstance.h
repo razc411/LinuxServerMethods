@@ -12,7 +12,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include <cstring>
-#include <thread>
 #include <mutex>
 #include <fstream>
 #include <sys/epoll.h>
@@ -22,19 +21,8 @@
 #include <vector>
 #include <cstdlib>
 
-class ClientInstance : public Thread
-{
-	public:
-		ClientInstance(int port, std::string host, int d_size, std::ofstream log, std::mutex mtx);
-		void run();
-		void send_echo();
-		long get_elapsed_time(struct timeval start);
-
-	private:
-		std::ofstream logfile;
-		std::mutex m_log;
-		int sd, sport, data_size;
-		std::string hostname;
-};
+void start_instance(int port, std::string host, int d_size, std::ofstream * log, std::mutex * mtx);
+void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log);
+long get_elapsed_time(struct timeval start);
 
 #endif // INSTANCE_H

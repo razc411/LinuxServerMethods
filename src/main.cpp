@@ -67,10 +67,7 @@ int main(int argc, char ** argv)
         else if(c == 'c')
         {
             Client echo_client(port, hostname, clients, data_size);
-            echo_client.connect_clients();
-            printf("Hit any key to begin transfer.");
-            std::cin.get();
-            echo_client.start_clients();
+            echo_client.connect_clients(port, hostname, data_size);
             break; 
         }
     }

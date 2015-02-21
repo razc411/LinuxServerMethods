@@ -74,7 +74,7 @@ void incoming_data(int fd)
     int	n, bytes_read = 0;
 	char *bp, buf[BUFFER_SIZE];
 
-    memset(buf, BUFFER_SIZE, 0);
+    memset(buf, 0, BUFFER_SIZE);
     bp = buf;
 
     while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
@@ -86,7 +86,7 @@ void incoming_data(int fd)
         {
             send (fd, buf, bytes_read, 0);
             bytes_read = 0;
-            memset(buf, BUFFER_SIZE, 0);
+            memset(buf, 0, BUFFER_SIZE);
             bp = buf;
         }
     }
