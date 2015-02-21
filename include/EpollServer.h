@@ -1,21 +1,25 @@
 #ifndef EPOLLSERVER_H
 #define EPOLLSERVER_H
 
-#include <errno.h>
-#include <fcntl.h>
-#include <netinet/in.h>
+#include <iostream>
+#include <string>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <netdb.h>
-#include <strings.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
 #include <unistd.h>
-#include <signal.h>
+#include <cstring>
+#include <fstream>
 #include <sys/epoll.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <vector>
+#include <fcntl.h>
+#include <cstdlib>
 #include "ThreadPool.h"
 
 #define BUFFER_SIZE             2048
@@ -42,5 +46,6 @@ class EpollServer
         void incoming_connection();
         void setup_server(int type);
 };
+
 
 #endif // EPOLLSERVER_H

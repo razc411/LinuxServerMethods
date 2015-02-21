@@ -1,8 +1,10 @@
-#include <iostream>
-#include <string>
-#include "include/EpollServer.h"
-#include "include/Client.h"
-#define OPTIONS "eltcp:h:t:"
+#include "../include/EpollServer.h"
+#include "../include/Client.h"
+
+#define EDGE_SERVER             1
+#define LEVEL_SERVER            2
+#define LEVEL_SERVER_NO_THREAD  3
+#define OPTIONS                 "eltcp:h:t:"
 /**
 *	Function: 	main(int, char **)
 *	Author: 	Ramzi Chennafi
@@ -21,7 +23,7 @@ int main(int argc, char ** argv)
 
     while((c = getopt(argc, argv, OPTIONS)) != -1)
     {
-        switch(optarg)
+        switch(c)
         {
             case 'p':
                 port = atoi(optarg);
@@ -66,8 +68,8 @@ int main(int argc, char ** argv)
         {
             Client echo_client(port, hostname, clients, data_size);
             echo_client.connect_clients();
-            printf("Hit any key to begin transfer.")
-            std::getline(std::cin, 0)
+            printf("Hit any key to begin transfer.");
+            std::cin.get();
             echo_client.start_clients();
             break; 
         }

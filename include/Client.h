@@ -1,14 +1,17 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include <iostream>
 #include <string>
 #include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <vector>
 #include <unistd.h>
-#include <cstring>
+#include <thread>
+#include <mutex>
+#include <fstream>
+#include <vector>
+#include <cstdlib>
+
+#include "ClientInstance.h"
 
 class Client
 {
@@ -19,9 +22,9 @@ class Client
         void start_clients();
 
     private:
-
+    	int clients;
         std::string hostname;
-        std::vector client_list;
+        std::vector<ClientInstance> client_list;
 };
 
 #endif // CLIENT_H
