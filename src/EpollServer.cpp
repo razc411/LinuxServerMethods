@@ -70,32 +70,36 @@ EpollServer::~EpollServer()
 */
 void incoming_data(int fd)
 {
-    int	n, bytes_read = 0;
-	char *bp, buf[BUFFER_SIZE];
-
-    memset(buf, 0, BUFFER_SIZE);
-    bp = buf;
-
-    while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
+    while(true)
     {
-        bp += n;
-        bytes_read += n;
+        int	n, bytes_read = 0;
+    	char *bp, buf[BUFFER_SIZE];
 
-        if(BUFFER_SIZE == bytes_read)
+        memset(buf, 0, BUFFER_SIZE);
+        bp = buf;
+
+        while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
+        {
+            bp += n;
+            bytes_read += n;
+
+            if(BUFFER_SIZE == bytes_read)
+            {
+                send (fd, buf, bytes_read, 0);
+                bytes_read = 0;
+                memset(buf, 0, BUFFER_SIZE);
+                bp = buf;
+            }
+        }
+        if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
         {
             send (fd, buf, bytes_read, 0);
-            bytes_read = 0;
-            memset(buf, 0, BUFFER_SIZE);
-            bp = buf;
+            break;
         }
-    }
-    if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-    {
-        send (fd, buf, bytes_read, 0);
-    }
-    else if (n == 0)
-    {
-        close(fd);
+        else if (n == 0)
+        {
+            close(fd);
+        }
     }
 }
 
