@@ -30,9 +30,10 @@ void Client::connect_clients(int port, std::string hostname, int data_size)
 	log.open("log.txt");
 	std::thread client_list[clients];
 
-	for(int i = 0; i < clients; ++i)
+	for(int i = 0; i < clients; i++)
 	{
 		client_list[i] = std::thread(start_instance, port, hostname, data_size, &log, &log_mutex);
+		client_list[i].join();
 	}
 
 	std::cout << clients << " clients created connected to " << hostname << "sending " << data_size << " bytes per second.\n";

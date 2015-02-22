@@ -140,12 +140,11 @@ void EpollServer::setup_server(int type)
 */
 void EpollServer::monitor_connections(int type)
 {
-    int num_fds = 0;
     setup_server(type);
 
     while (1)
     {
-        num_fds = epoll_wait (epoll_fd, events, EPOLL_QUEUE_LEN, -1);
+        int num_fds = epoll_wait (epoll_fd, events, EPOLL_QUEUE_LEN, -1);
         if (num_fds < 0)
         {
             continue;
