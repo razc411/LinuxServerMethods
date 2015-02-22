@@ -87,11 +87,6 @@ void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
 	    	printf("Connection closed.");
 	        close(sd);
 	    }
-	    else
-	    {
-	        perror("Receive error");
-	        close(sd);
-	    }
 	}
 
 	milliseconds = get_elapsed_time(start_time);
