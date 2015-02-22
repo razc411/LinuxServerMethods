@@ -81,13 +81,13 @@ void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
 	}
  	if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
     {
-        send (fd, buf, bytes_read, 0);
+        send (sd, buffer, bytes_read, 0);
     }
     else if (n == 0)
     {
-        close(fd);
+        close(sd);
     }
-    
+
 	milliseconds = get_elapsed_time(start_time);
 
 	m_log->lock();
