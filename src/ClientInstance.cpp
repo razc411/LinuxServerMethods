@@ -79,7 +79,7 @@ void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
 		total_bytes += n;
 		bp += n;
 	}
-    else if (n == 0)
+    if (n == 0)
     {
         close(sd);
     }
