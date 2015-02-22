@@ -79,10 +79,6 @@ void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
 		total_bytes += n;
 		bp += n;
 	}
- 	if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-    {
-        send (sd, buffer, bytes_read, 0);
-    }
     else if (n == 0)
     {
         close(sd);
