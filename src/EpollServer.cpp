@@ -92,7 +92,6 @@ void incoming_data(int fd)
     if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
     {
         send (fd, buf, bytes_read, 0);
-        break;
     }
     else if (n == 0)
     {
