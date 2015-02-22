@@ -98,11 +98,6 @@ void incoming_data(int fd)
     {
         close(fd);
     }
-    else
-    {
-        perror("Receive error");
-        close(fd);
-    }
 }
 
 void EpollServer::setup_server(int type)

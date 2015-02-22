@@ -77,6 +77,7 @@ void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
 	while ((n = recv (sd, bp, bytes_to_read, 0)) > 0)
 	{
 		total_bytes += n;
+		bp += n;
 
 		if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
 	    {
