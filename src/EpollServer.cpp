@@ -43,6 +43,7 @@
 EpollServer::EpollServer(int s_port, int threads) : port(s_port)
 {
     fd_server = create_listener();
+    pool = new ThreadPool(4);
 }
 /**
 *	Function: 	monitor_connections
@@ -80,14 +81,6 @@ void incoming_data(int fd)
     {
         bp += n;
         bytes_read += n;
-
-        if(BUFFER_SIZE == bytes_read)
-        {
-            send (fd, buf, bytes_read, 0);
-            bytes_read = 0;
-            memset(buf, 0, BUFFER_SIZE);
-            bp = buf;
-        }
     }
     if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
     {
@@ -134,7 +127,6 @@ void EpollServer::setup_server(int type)
 */
 void EpollServer::monitor_connections(int type)
 {
-   // ThreadPool pool(4);
     setup_server(type);
 
     while (1)
@@ -149,7 +141,7 @@ void EpollServer::monitor_connections(int type)
         {
             if (events[i].events & (EPOLLHUP | EPOLLERR))
             {
-                fprintf(stderr, "Connection Closed");
+                fprintf(stderr, "Connection Closed\n");
                 close(events[i].data.fd);
                 continue;
             }
@@ -162,15 +154,15 @@ void EpollServer::monitor_connections(int type)
 
             int temp = events[i].data.fd;
 
-            // if(type < LEVEL_SERVER_NO_THREAD)
-            // {
-            //     pool.enqueue(incoming_data, temp);
-            //     continue;
-            // }
-            // else
-            // {
+            if(type < LEVEL_SERVER_NO_THREAD)
+            {
+                pool->enqueue(incoming_data, temp);
+                continue;
+            }
+            else
+            {
                 incoming_data(temp);
-            //}
+            }
         }
     }
     
@@ -258,8 +250,6 @@ void EpollServer::incoming_connection()
         printf("%d", errno);
         callError("epoll_ctl new incoming");
     }
-
-    printf("Remote Address:  %s\n", inet_ntoa(remote_addr.sin_addr));
 }
 /**
 *	Function: 	monitor_connections
