@@ -70,36 +70,33 @@ EpollServer::~EpollServer()
 */
 void incoming_data(int fd)
 {
-    while(true)
+    int	n, bytes_read = 0;
+	char *bp, buf[BUFFER_SIZE];
+
+    memset(buf, 0, BUFFER_SIZE);
+    bp = buf;
+
+    while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
     {
-        int	n, bytes_read = 0;
-    	char *bp, buf[BUFFER_SIZE];
+        bp += n;
+        bytes_read += n;
 
-        memset(buf, 0, BUFFER_SIZE);
-        bp = buf;
-
-        while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
-        {
-            bp += n;
-            bytes_read += n;
-
-            if(BUFFER_SIZE == bytes_read)
-            {
-                send (fd, buf, bytes_read, 0);
-                bytes_read = 0;
-                memset(buf, 0, BUFFER_SIZE);
-                bp = buf;
-            }
-        }
-        if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
+        if(BUFFER_SIZE == bytes_read)
         {
             send (fd, buf, bytes_read, 0);
-            break;
+            bytes_read = 0;
+            memset(buf, 0, BUFFER_SIZE);
+            bp = buf;
         }
-        else if (n == 0)
-        {
-            close(fd);
-        }
+    }
+    if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
+    {
+        send (fd, buf, bytes_read, 0);
+        break;
+    }
+    else if (n == 0)
+    {
+        close(fd);
     }
 }
 
@@ -138,7 +135,7 @@ void EpollServer::setup_server(int type)
 */
 void EpollServer::monitor_connections(int type)
 {
-    ThreadPool pool(4);
+   // ThreadPool pool(4);
     setup_server(type);
 
     while (1)
@@ -166,15 +163,15 @@ void EpollServer::monitor_connections(int type)
 
             int temp = events[i].data.fd;
 
-            if(type < LEVEL_SERVER_NO_THREAD)
-            {
-                pool.enqueue(incoming_data, temp);
-                continue;
-            }
-            else
-            {
+            // if(type < LEVEL_SERVER_NO_THREAD)
+            // {
+            //     pool.enqueue(incoming_data, temp);
+            //     continue;
+            // }
+            // else
+            // {
                 incoming_data(temp);
-            }
+            //}
         }
     }
     
