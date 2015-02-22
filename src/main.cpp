@@ -5,7 +5,7 @@
 #define LEVEL_SERVER            2
 #define LEVEL_SERVER_NO_THREAD  3
 #define CLIENT                  4
-#define OPTIONS                 "elwc:Cp:h:t:"
+#define OPTIONS                 "ed:lwc:Cp:h:t:"
 /**
 *	Function: 	main(int, char **)
 *	Author: 	Ramzi Chennafi

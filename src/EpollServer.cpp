@@ -43,7 +43,6 @@
 EpollServer::EpollServer(int s_port, int threads) : port(s_port)
 {
     fd_server = create_listener();
-    pool = new ThreadPool(threads);
 }
 /**
 *	Function: 	monitor_connections
@@ -135,6 +134,7 @@ void EpollServer::setup_server(int type)
 */
 void EpollServer::monitor_connections(int type)
 {
+    ThreadPool pool(4);
     setup_server(type);
 
     while (1)
@@ -164,7 +164,7 @@ void EpollServer::monitor_connections(int type)
 
             if(type < LEVEL_SERVER_NO_THREAD)
             {
-                pool->enqueue(incoming_data, temp);
+                pool.enqueue(incoming_data, temp);
                 continue;
             }
             else
