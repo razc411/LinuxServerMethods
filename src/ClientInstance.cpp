@@ -1,13 +1,25 @@
+/**
+*	Program:	Server Comparison System
+*	Author: 	Ramzi Chennafi
+*	Date: 		Febuary 10 2015
+*	Functions:
+*		int start_instance(int port, std::string host)
+*       void send_echo(int sd, int data_size, std::ofstream * clientlog)
+*
+*	Description
+*	Contains functions to send data out
+*/
 #include "../include/ClientInstance.h"
 /**
-*	Function: 	monitor_connections
+*	Function: 	start_instance(int port, std::string host)
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
-*	Returns:	void
-*
+*	Returns:	int - the socket created for the client
+*	
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Starts up a client instance. Connects to the server.
+*		port - port to send data to
+*		host - hostname of server
 */
 int start_instance(int port, std::string host)
 {
@@ -43,14 +55,16 @@ int start_instance(int port, std::string host)
 	return sd;
 }
 /**
-*	Function: 	monitor_connections
+*	Function: 	send_echo(int sd, int data_sie, ofstream * clientlog)
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Sends data to the server and recieves an echo from the server. Also logs all data to client_log.
+*		sd - socket of the client
+*		data_size - amount of data to send to the server
+*		clientlog - pointer to the clientlog variable for data logging
 */	
 void send_echo(int sd, int data_size, std::ofstream * clientlog)
 {
@@ -83,7 +97,7 @@ void send_echo(int sd, int data_size, std::ofstream * clientlog)
 
 	milliseconds = get_elapsed_time(start_time);
 
-	*clientlog << "Sent " << data_size << ":" << milliseconds << "," << std::endl;
+	*clientlog <<<< data_size << "," << milliseconds << std::endl;
 }
 
 /**

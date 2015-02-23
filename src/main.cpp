@@ -10,17 +10,30 @@
 /**
 *	Function: 	main(int, char **)
 *	Author: 	Ramzi Chennafi
-*	Date:		January 7 2015
+*	Date:		Feb 21 2015
 *	Returns:	int, error code
 *
 *	Notes
 *	Main entry loop for the program, checks for arguments and begins the program according
-*	to the arguments.
+*	to the arguments. Can establish 3 different types of servers (EDGE_SERVER, LEVEL_SERVER, LEVEL_SERVER_NO_THREAD)
+*   and a client. Below are the arguments, these are optional.
+*       p <port>        - port for the server to be established on or the client to send to.     DEFAULT: 5001
+*       t <num threads> - number of threads for the threaded servers to run on.                  DEFAULT: 4
+*       h <hostname>    - host to send data to for the client.                                   DEFAULT: LOCALHOST
+*       d <data size>   - the amount of data in bytes for each client to send.                   DEFAULT: 1000000
+*       c <num clients> - the number of clients to create :                                      DEFAULT: 1
+*       
+*       1 of these arguments is required to run
+*       e - runs the edge triggered threaded server.
+*       w - runs the level triggered non threaded server.
+*       l - runs the level triggered threaded server.
+*       C - runs the client.
+*       ? - runs the help 
 */
 int main(int argc, char ** argv)
 {
     char c;
-    int threads = 4, port = 5001, clients = 1, data_size = 1000;
+    int threads = 4, port = 5001, clients = 1, data_size = 1000000;
     int type = EDGE_SERVER;
     std::string hostname("localhost");
     std::ofstream server_log;
@@ -30,6 +43,19 @@ int main(int argc, char ** argv)
     {
         switch(c)
         {
+            case '?':
+        cout << "*       p <port>        - port for the server to be established on or the client to send to.     DEFAULT: 5001\n
+                *       t <num threads> - number of threads for the threaded servers to run on.                  DEFAULT: 4\n
+                *       h <hostname>    - host to send data to for the client.                                   DEFAULT: LOCALHOST\n
+                *       d <data size>   - the amount of data in bytes for each client to send.                   DEFAULT: 1000000\n
+                *       c <num clients> - the number of clients to create :                                      DEFAULT: 1\n\n
+                *       
+                *       1 of these arguments is required to run\n
+                *       e - runs the edge triggered threaded server.\n
+                *       w - runs the level triggered non threaded server.\n
+                *       l - runs the level triggered threaded server.\n
+                *       C - runs the client."
+                break;
             case 'p':
                 port = atoi(optarg);
                 break;

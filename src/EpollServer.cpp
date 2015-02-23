@@ -3,71 +3,68 @@
 *	Author: 	Ramzi Chennafi
 *	Date: 		Febuary 10 2015
 *	Functions:
-*		EpollServer()
-*       ~EpollServer()
-*       void monitor_connections()
-*       int create_listener()
-*       void incoming_connection(int fd_server, struct sockaddr* remote_addr, struct * epoll_event event)
-*       int incoming_data(int fd)
+*		EpollServer::EpollServer(int s_port, int threads, std::ofstream * log) : port(s_port), server_log(log)
+*       EpollServer::~EpollServer()
+*       void EpollServer::monitor_connections(int type)
+*       int EpollServer::create_listener()
+*       void EpollServer::setup_server(int type)
+*       void EpollServer::incoming_connection()
+*       void incoming_data(int fd, std::ofstream * server_log)
 *       int send_echo(int fd)
-*       int s_exit()
-*       void callError(string error)
+*       void EpollServer::s_exit(int code)
+*       void EpollServer::callError(const char* error)
 *
 *	Description
-*	This program allows the user to do a comparison between threads and processes using prime number
-*	calculations. Allows for specification of the number of threads/processes and the maximum number to calculate
-*	primes up to.
-*
-*	Takes the switches...
-*		-p - specifies to do calculation in process mode
-*		-t - specifies to do calculation in thread mode
-*		-m arg - specifies the maximum value to calculate prime to, takes an argument from 2 to infinity.
-*		-n arg - specifies the amount of threads/processes to be made, takes an argument from 1 to infinity.
-*		-v - causes each prime number to be printed to terminal, causes an extreme increase in processing time and
-*			may break the program if factoring a number greater than 10 000 000.
-*		-i arg - specifies the iterations to run the testing for. Defaults to 1 iteration.
-*		-f arg - specifies the filename for the log.
-*
+*	This cpp file represents the server side of the comparison program. It allows for running a server in edge triggered 
+*   epoll threaded mode, level triggered threaded epoll mode, and non threaded level triggered epoll mode. Chooses the server
+*   based on the type passed to the constructor.
 */
 #include "../include/EpollServer.h"
 /**
-*	Function: 	monitor_connections
+*	Function: 	EpollServer(int s_port, int threads, std::ofstream * log) : port(s_port), server_log(log)
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Constructor for the EpollServer. Creates the threadpool and the listener socket for the server.
+*       s_port - port for the server to run on
+*       threads - number of threads to run in the pool
+*       log - pointer to the logfile for writing
+*       type - type of server to run, can be LEVEL_SERVER_NO_THREAD, EDGE_SERVER or LEVEL_SERVER
 */
-EpollServer::EpollServer(int s_port, int threads, std::ofstream * log) : port(s_port), server_log(log)
+EpollServer::EpollServer(int s_port, int threads, std::ofstream * log, int type) : port(s_port), server_log(log)
 {
     fd_server = create_listener();
-    pool = new ThreadPool(4);
+    
+    if(type != LEVEL_SERVER_NO_THREAD)
+    {
+        pool = new ThreadPool(threads);
+    }
 }
 /**
-*	Function: 	monitor_connections
+*	Function: 	EpollServer::~EpollServer()
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Destructor for the EpollServer.
 */
 EpollServer::~EpollServer()
 {
     delete [] pool;
 }
 /**
-*	Function: 	monitor_connections
+*	Function: 	void incoming_data(int fd, std::ofstream * server_log)
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Function for recieving and sending echos. Prints data to the server log.
+*       fd - socket to send the data on
+*       server_log - pointer to the server log file
 */
 void incoming_data(int fd, std::ofstream * server_log)
 {
@@ -96,7 +93,16 @@ void incoming_data(int fd, std::ofstream * server_log)
     getpeername(fd, (sockaddr*)&remote_addr, &address_len);
     *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << bytes_read << "," << std::endl;
 }
-
+/**
+*   Function:   void EpollServer::setup_server(int type)
+*   Author:     Ramzi Chennafi
+*   Date:       Febuary 10 2015
+*   Returns:    void
+*
+*   Notes
+*   Sets the server up.
+*       type - type of server to create, LEVEL_SERVER_NO_THREADS, EDGE_SERVER or LEVEL_SERVER.
+*/
 void EpollServer::setup_server(int type)
 {
     if((epoll_fd = epoll_create(EPOLL_QUEUE_LEN)) == -1)
@@ -121,14 +127,14 @@ void EpollServer::setup_server(int type)
 }
 
 /**
-*	Function: 	monitor_connections
+*	Function: 	void EpollServer::monitor_connections(int type)
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Main server loop. Monitors for incoming connections and incoming data.
+*       type - type of server to create, LEVEL_SERVER_NO_THREADS, EDGE_SERVER or LEVEL_SERVER.
 */
 void EpollServer::monitor_connections(int type)
 {
@@ -175,14 +181,13 @@ void EpollServer::monitor_connections(int type)
     exit(0);
 }
 /**
-*	Function: 	monitor_connections
+*	Function: 	EpollServer::create_listener
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Creates the listener socket for the server.
 */
 int EpollServer::create_listener()
 {
@@ -221,14 +226,13 @@ int EpollServer::create_listener()
     return fd_server;
 }
 /**
-*	Function: 	monitor_connections
+*	Function: 	void EpollServer::incoming_connection()
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Called when an incoming connection is detected. Writes connection data to the server_log.
 */
 void EpollServer::incoming_connection()
 {
@@ -259,14 +263,14 @@ void EpollServer::incoming_connection()
     *server_log << "New client at IP " <<  inet_ntoa(remote_addr.sin_addr) << " added." << std::endl;
 }
 /**
-*	Function: 	monitor_connections
+*	Function: 	void EpollServer::s_exit(int code)
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Exit function for the server, closes the listening socket.
+*       int code - code for the error.
 */
 void EpollServer::s_exit(int code)
 {
@@ -274,14 +278,14 @@ void EpollServer::s_exit(int code)
     exit(1);
 }
 /**
-*	Function: 	monitor_connections
+*	Function: 	void EpollServer::callError(const char* error)
 *	Author: 	Ramzi Chennafi
 *	Date:		Febuary 10 2015
 *	Returns:	void
 *
 *	Notes
-*	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
-*   and responds accordingly. Manages listening, reading and writing.
+*	Prints the error message for the sent code and calls server_exit.
+*       error - the error message to print.
 */
 void EpollServer::callError(const char* error)
 {
