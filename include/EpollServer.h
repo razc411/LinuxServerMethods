@@ -28,6 +28,8 @@
 #define LEVEL_SERVER            2
 #define LEVEL_SERVER_NO_THREAD  3
 
+extern std::ofstream server_log;
+
 class EpollServer
 {
     public:

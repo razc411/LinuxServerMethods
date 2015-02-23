@@ -6,6 +6,9 @@
 #define LEVEL_SERVER_NO_THREAD  3
 #define CLIENT                  4
 #define OPTIONS                 "ed:lwc:Cp:h:t:"
+
+std::ofstream server_log("srverlog");
+
 /**
 *	Function: 	main(int, char **)
 *	Author: 	Ramzi Chennafi

@@ -73,6 +73,8 @@ void incoming_data(int fd)
 {
     int	n, bytes_read = 0;
 	char *bp, buf[BUFFER_SIZE];
+    struct sockaddr_in remote_addr;
+    struct socklen_t address_len = sizeof(struct sockaddr_in);
 
     memset(buf, 0, BUFFER_SIZE);
     bp = buf;
@@ -90,6 +92,9 @@ void incoming_data(int fd)
     {
         close(fd);
     }
+
+    getpeername(fd, &remote_addr, &address_len);
+    server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_family) << ": " << bytes_read << ",\n";
 }
 
 void EpollServer::setup_server(int type)
@@ -250,6 +255,8 @@ void EpollServer::incoming_connection()
         printf("%d", errno);
         callError("epoll_ctl new incoming");
     }
+
+    server_log << "New client at IP " <<  inet_ntoa(remote_addr.sin_addr) << "added.";
 }
 /**
 *	Function: 	monitor_connections
