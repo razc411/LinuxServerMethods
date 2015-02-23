@@ -162,16 +162,17 @@ void EpollServer::monitor_connections(int type)
 
         for (int i = 0; i < num_fds; i++)
         {
-            if (events[i].events & (EPOLLHUP | EPOLLERR))
-            {
-                fprintf(stderr, "Connection Closed\n");
-                close(events[i].data.fd);
-                continue;
-            }
 
             if (events[i].data.fd == fd_server)
             {
                 incoming_connection();
+                continue;
+            }
+
+            if (events[i].events & (EPOLLHUP | EPOLLERR))
+            {
+                fprintf(stderr, "Connection Closed\n");
+                close(events[i].data.fd);
                 continue;
             }
 
