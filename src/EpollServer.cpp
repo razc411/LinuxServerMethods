@@ -159,10 +159,6 @@ void EpollServer::monitor_connections(int type)
     while (1)
     {
         int num_fds = epoll_wait (epoll_fd, events, EPOLL_QUEUE_LEN, -1);
-        if (num_fds < 0)
-        {
-            continue;
-        }
 
         for (int i = 0; i < num_fds; i++)
         {
