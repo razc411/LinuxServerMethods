@@ -34,6 +34,7 @@
 *       type - type of server to run, can be LEVEL_SERVER_NO_THREAD, EDGE_SERVER or LEVEL_SERVER
 */
 std::mutex mtx;
+int total_data_read = 0;
 
 EpollServer::EpollServer(int s_port, int threads, std::ofstream * log, int type) : port(s_port), server_log(log)
 {
@@ -104,7 +105,8 @@ void incoming_data(int fd, std::ofstream * server_log)
 
     getpeername(fd, (sockaddr*)&remote_addr, &address_len);
     mtx.lock();
-    *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << total_data << "," << std::endl;
+    total_data_read += total_data;
+    *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << total_data << "," << total_data_read << std::endl;
     mtx.unlock();
 }
 /**
