@@ -29,8 +29,6 @@
 #define LEVEL_SERVER            2
 #define LEVEL_SERVER_NO_THREAD  3
 
-std::mutex mtx;
-
 class EpollServer
 {
     public:

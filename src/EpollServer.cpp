@@ -33,6 +33,8 @@
 *       log - pointer to the logfile for writing
 *       type - type of server to run, can be LEVEL_SERVER_NO_THREAD, EDGE_SERVER or LEVEL_SERVER
 */
+std::mutex mtx;
+
 EpollServer::EpollServer(int s_port, int threads, std::ofstream * log, int type) : port(s_port), server_log(log)
 {
     fd_server = create_listener();
