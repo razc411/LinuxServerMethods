@@ -98,6 +98,11 @@ void incoming_data(int fd, std::ofstream * server_log)
         close(fd);
     }
 
+    if(total_data == 0)
+    {
+        return;
+    }
+
     getpeername(fd, (sockaddr*)&remote_addr, &address_len);
     *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << total_data << "," << std::endl;
 }
@@ -178,6 +183,7 @@ void EpollServer::monitor_connections(int type)
                 pool->enqueue(incoming_data, temp, server_log);
                 continue;
             }
+
             else
             {
                 incoming_data(temp, server_log);
