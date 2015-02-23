@@ -162,16 +162,6 @@ void EpollServer::monitor_connections(int type)
 
         for (int i = 0; i < num_fds; i++)
         {
-            //if(events[i].events & EPOLLIN){
-                if (events[i].data.fd == fd_server)
-                {
-                    incoming_connection();
-                    continue;
-                }
-
-                //continue;
-            //}
-
             if (events[i].events & (EPOLLHUP | EPOLLERR))
             {
                 fprintf(stderr, "Connection Closed\n");
@@ -179,18 +169,27 @@ void EpollServer::monitor_connections(int type)
                 continue;
             }
 
-            int temp = events[i].data.fd;
+            if(events[i].events & EPOLLIN){
+                if (events[i].data.fd == fd_server)
+                {
+                    incoming_connection();
+                    continue;
+                }
 
-            if(type < LEVEL_SERVER_NO_THREAD)
-            {
-                pool->enqueue(incoming_data, temp, server_log);
+                int temp = events[i].data.fd;
+
+                if(type < LEVEL_SERVER_NO_THREAD)
+                {
+                    pool->enqueue(incoming_data, temp, server_log);
+                }
+
+                else
+                {
+                    incoming_data(temp, server_log);
+                }
                 continue;
             }
-
-            else
-            {
-                incoming_data(temp, server_log);
-            }
+        
         }
     }
     
