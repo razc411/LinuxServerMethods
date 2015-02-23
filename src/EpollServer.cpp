@@ -256,7 +256,7 @@ void EpollServer::incoming_connection()
     struct sockaddr_in remote_addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
 
-    if ((fd_new = accept(fd_server, (struct sockaddr*)&remote_addr, &addr_size)) == -1)
+    if ((fd_new = accept4(fd_server, (struct sockaddr*)&remote_addr, &addr_size, SOCK_NONBLOCK)) == -1)
     {
         if (errno != EAGAIN && errno != EWOULDBLOCK)
         {
@@ -264,10 +264,6 @@ void EpollServer::incoming_connection()
         }
     }
 
-    if (fcntl(fd_new, F_SETFL, O_NONBLOCK | fcntl(fd_new, F_GETFL, 0)) == -1)
-    {
-        callError("Failure at fcntl.");
-    }
     event.data.fd = fd_new;
 
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd_new, &event) == -1)
