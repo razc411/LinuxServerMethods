@@ -258,18 +258,13 @@ void EpollServer::incoming_connection()
 
     while((fd_new = accept4(fd_server, (struct sockaddr*)&remote_addr, &addr_size, SOCK_NONBLOCK)) == -1)
     {
-        if (errno != EAGAIN && errno != EWOULDBLOCK)
+        event.data.fd = fd_new;
+
+        if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd_new, &event) == -1)
         {
-            perror("accept incoming");
+            printf("%d", errno);
+            callError("epoll_ctl new incoming");
         }
-    }
-
-    event.data.fd = fd_new;
-
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd_new, &event) == -1)
-    {
-        printf("%d", errno);
-        callError("epoll_ctl new incoming");
     }
 
     *server_log << "New client at IP " <<  inet_ntoa(remote_addr.sin_addr) << " added." << std::endl;
