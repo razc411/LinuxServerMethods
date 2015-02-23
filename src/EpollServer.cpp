@@ -75,11 +75,13 @@ void incoming_data(int fd, std::ofstream * server_log)
 
     memset(buf, 0, BUFFER_SIZE);
     bp = buf;
+    int total_data = 0;
 
     while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
     {
         bp += n;
         bytes_read += n;
+        total_data += n;
         if(bytes_read == BUFFER_SIZE)
         {
             send (fd, buf, bytes_read, 0);
@@ -96,7 +98,7 @@ void incoming_data(int fd, std::ofstream * server_log)
     }
 
     getpeername(fd, (sockaddr*)&remote_addr, &address_len);
-    *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << bytes_read << "," << std::endl;
+    *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << total_data << "," << std::endl;
 }
 /**
 *   Function:   void EpollServer::setup_server(int type)
