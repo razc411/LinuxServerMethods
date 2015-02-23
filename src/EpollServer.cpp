@@ -177,22 +177,21 @@ void EpollServer::monitor_connections(int type)
                     if(errno != EAGAIN || errno != EWOULDBLOCK){
                         perror("Error on accept4");
                     }
-
-                    continue;
                 }
 
-                int temp = events[i].data.fd;
-
-                if(type < LEVEL_SERVER_NO_THREAD)
-                {
-                    pool->enqueue(incoming_data, temp, server_log);
-                }
-
-                else
-                {
-                    incoming_data(temp, server_log);
-                }
                 continue;
+            }
+
+            int temp = events[i].data.fd;
+
+            if(type < LEVEL_SERVER_NO_THREAD)
+            {
+                pool->enqueue(incoming_data, temp, server_log);
+            }
+
+            else
+            {
+                incoming_data(temp, server_log);
             }
         
         }
