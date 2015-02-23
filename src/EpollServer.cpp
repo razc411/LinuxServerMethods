@@ -40,7 +40,7 @@
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */
-EpollServer::EpollServer(int s_port, int threads) : port(s_port)
+EpollServer::EpollServer(int s_port, int threads, std::ofstream * log) : port(s_port), server_log(log)
 {
     fd_server = create_listener();
     pool = new ThreadPool(4);
@@ -69,12 +69,12 @@ EpollServer::~EpollServer()
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */
-void incoming_data(int fd)
+void incoming_data(int fd, std::ofstream * server_log)
 {
     int	n, bytes_read = 0;
 	char *bp, buf[BUFFER_SIZE];
-    struct sockaddr_in remote_addr;
-    struct socklen_t address_len = sizeof(struct sockaddr_in);
+    sockaddr_in remote_addr;
+    socklen_t address_len = sizeof(struct sockaddr_in);
 
     memset(buf, 0, BUFFER_SIZE);
     bp = buf;
@@ -93,8 +93,8 @@ void incoming_data(int fd)
         close(fd);
     }
 
-    getpeername(fd, &remote_addr, &address_len);
-    server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_family) << ": " << bytes_read << ",\n";
+    getpeername(fd, (sockaddr*)&remote_addr, &address_len);
+    *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << bytes_read << "," << std::endl;
 }
 
 void EpollServer::setup_server(int type)
@@ -161,12 +161,12 @@ void EpollServer::monitor_connections(int type)
 
             if(type < LEVEL_SERVER_NO_THREAD)
             {
-                pool->enqueue(incoming_data, temp);
+                pool->enqueue(incoming_data, temp, server_log);
                 continue;
             }
             else
             {
-                incoming_data(temp);
+                incoming_data(temp, server_log);
             }
         }
     }
@@ -256,7 +256,7 @@ void EpollServer::incoming_connection()
         callError("epoll_ctl new incoming");
     }
 
-    server_log << "New client at IP " <<  inet_ntoa(remote_addr.sin_addr) << "added.";
+    *server_log << "New client at IP " <<  inet_ntoa(remote_addr.sin_addr) << " added." << std::endl;
 }
 /**
 *	Function: 	monitor_connections

@@ -7,8 +7,6 @@
 #define CLIENT                  4
 #define OPTIONS                 "ed:lwc:Cp:h:t:"
 
-std::ofstream server_log("srverlog");
-
 /**
 *	Function: 	main(int, char **)
 *	Author: 	Ramzi Chennafi
@@ -25,6 +23,8 @@ int main(int argc, char ** argv)
     int threads = 4, port = 5001, clients = 1, data_size = 1000;
     int type = EDGE_SERVER;
     std::string hostname("localhost");
+    std::ofstream server_log;
+    server_log.open("server_log");
 
     while((c = getopt(argc, argv, OPTIONS)) != -1)
     {
@@ -69,15 +69,15 @@ int main(int argc, char ** argv)
     switch(type)
     {
         case EDGE_SERVER:
-            eServer = new EpollServer(port, threads);
+            eServer = new EpollServer(port, threads, &server_log);
             eServer->monitor_connections(EDGE_SERVER);
             break;
         case LEVEL_SERVER:
-            eServer = new EpollServer(port, threads);
+            eServer = new EpollServer(port, threads, &server_log);
             eServer->monitor_connections(LEVEL_SERVER);
             break;
         case LEVEL_SERVER_NO_THREAD:
-            eServer = new EpollServer(port, threads);
+            eServer = new EpollServer(port, threads, &server_log);
             eServer->monitor_connections(LEVEL_SERVER_NO_THREAD);
             break;
         case CLIENT:

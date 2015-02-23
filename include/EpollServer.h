@@ -23,22 +23,21 @@
 #include "ThreadPool.h"
 
 #define BUFFER_SIZE             2048
-#define EPOLL_QUEUE_LEN         255
+#define EPOLL_QUEUE_LEN         255000
 #define EDGE_SERVER             1
 #define LEVEL_SERVER            2
 #define LEVEL_SERVER_NO_THREAD  3
 
-extern std::ofstream server_log;
-
 class EpollServer
 {
     public:
-        EpollServer(int s_port, int threads);
+        EpollServer(int s_port, int threads, std::ofstream * log);
         ~EpollServer();
         void monitor_connections(int type);
 
     private:
         int fd_server, epoll_fd, port;
+        std::ofstream * server_log;
         ThreadPool * pool;
         struct epoll_event events[EPOLL_QUEUE_LEN], event;
 

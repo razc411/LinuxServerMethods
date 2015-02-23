@@ -25,16 +25,26 @@ Client::Client(int port, std::string hostname, int num_clients, int data_size) :
 */
 void Client::connect_clients(int port, std::string hostname, int data_size)
 {
-	std::ofstream log;
+	std::ofstream clientlog;
 	std::mutex log_mutex;
-	log.open("log.txt");
-	std::thread client_list[clients];
+	clientlog.open("client_log");
+	int client_list[clients];
 
 	for(int i = 0; i < clients; i++)
 	{
-		client_list[i] = std::thread(start_instance, port, hostname, data_size, &log, &log_mutex);
-		client_list[i].join();
+		client_list[i] = start_instance(port, hostname);
 	}
 
 	std::cout << clients << " clients created connected to " << hostname << "sending " << data_size << " bytes per second.\n";
+	std::cout << "Hit any key to begin transfer." << std::endl;
+	std::cin.get();
+
+	while(true)
+	{
+		for(int i = 0; i < clients; i++)
+		{
+			send_echo(client_list[i], data_size, &log_mutex, &clientlog);
+		}
+
+	}
 }

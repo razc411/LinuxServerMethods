@@ -9,7 +9,7 @@
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */
-void start_instance(int port, std::string host, int d_size, std::ofstream * log, std::mutex * mtx)
+int start_instance(int port, std::string host)
 {
 	int sd;
 	struct hostent	*hp;
@@ -40,10 +40,7 @@ void start_instance(int port, std::string host, int d_size, std::ofstream * log,
 
 	printf("Connected:    Server Name: %s\n", hp->h_name);
 	
-	while(true)
-	{
-		send_echo(sd, d_size, mtx, log);
-	}
+	return sd;
 }
 /**
 *	Function: 	monitor_connections
@@ -55,7 +52,7 @@ void start_instance(int port, std::string host, int d_size, std::ofstream * log,
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */	
-void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
+void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * clientlog)
 {
     char * bp;
     struct timeval start_time;
@@ -74,7 +71,7 @@ void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
 	bp = buffer;
 	bytes_to_read = data_size;
 
-	while ((n = recv (sd, bp, bytes_to_read, 0)) > 0)
+	while ((n = recv (sd, bp, bytes_to_read, 0)) < data_size )
 	{
 		total_bytes += n;
 		bp += n;
@@ -86,16 +83,7 @@ void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * log)
 
 	milliseconds = get_elapsed_time(start_time);
 
-	m_log->lock();
-	*log << milliseconds << ",";
-	m_log->unlock();
-
-	if(total_bytes != data_size)
-	{
-		printf("Only recieved an echo of %d bytes.", total_bytes);
-	}
-
-	sleep(1);
+	*clientlog << "Sent " << data_size << ":" << milliseconds << "," << std::endl;
 }
 
 /**
