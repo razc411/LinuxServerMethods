@@ -173,6 +173,11 @@ void EpollServer::monitor_connections(int type)
                 if (events[i].data.fd == fd_server)
                 {
                     incoming_connection();
+                    
+                    if(errno != EAGAIN || errno != EWOULDBLOCK){
+                        perror("Error on accept4");
+                    }
+
                     continue;
                 }
 
