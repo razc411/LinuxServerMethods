@@ -76,7 +76,6 @@ void incoming_data(int fd, std::ofstream * server_log)
     socklen_t address_len = sizeof(struct sockaddr_in);
 
     memset(buf, 0, BUFFER_SIZE);
-    bp = buf;
 
     while ((n = recv (fd, &buf[bytes_read], BUFFER_SIZE - bytes_read, 0)) > 0)
     {
