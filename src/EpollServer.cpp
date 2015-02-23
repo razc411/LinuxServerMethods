@@ -217,11 +217,6 @@ int EpollServer::create_listener()
         callError("Failure at setsockopt: listener.");
     }
 
-    if (fcntl (fd_server, F_SETFL, O_NONBLOCK | fcntl (fd_server, F_GETFL, 0)) == -1)
-    {
-        callError("Failure at fcntl: listener.");
-    }
-
     memset (&addr, 0, sizeof (struct sockaddr_in));
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -234,6 +229,11 @@ int EpollServer::create_listener()
     if (listen (fd_server, SOMAXCONN) == -1)
     {
         callError("Failure at listen.");
+    }
+
+    if (fcntl (fd_server, F_SETFL, O_NONBLOCK | fcntl (fd_server, F_GETFL, 0)) == -1)
+    {
+        callError("Failure at fcntl: listener.");
     }
 
     return fd_server;
