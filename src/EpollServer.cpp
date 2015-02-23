@@ -104,7 +104,9 @@ void incoming_data(int fd, std::ofstream * server_log)
     }
 
     getpeername(fd, (sockaddr*)&remote_addr, &address_len);
+    mtx.lock();
     *server_log << "Thread " << pthread_self() << ":" << inet_ntoa(remote_addr.sin_addr) << ": " << total_data << "," << std::endl;
+    mtx.unlock();
 }
 /**
 *   Function:   void EpollServer::setup_server(int type)
