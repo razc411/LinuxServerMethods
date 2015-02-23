@@ -80,6 +80,11 @@ void incoming_data(int fd, std::ofstream * server_log)
     {
         bp += n;
         bytes_read += n;
+        if(bytes_read == BUFFER_SIZE)
+        {
+            send (fd, buf, bytes_read, 0);
+            bytes_read = 0;
+        }
     }
     if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
     {
