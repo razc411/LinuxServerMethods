@@ -168,11 +168,6 @@ void EpollServer::monitor_connections(int type)
                     incoming_connection();
                 }
 
-                if(errno != EAGAIN || errno != EWOULDBLOCK)
-                {
-                    callError("Error on accept.");
-                }
-
                 continue;
             }
 
