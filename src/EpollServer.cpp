@@ -78,7 +78,7 @@ void incoming_data(int fd, std::ofstream * server_log)
     memset(buf, 0, BUFFER_SIZE);
     bp = buf;
 
-    while ((n = recv (fd, buf[bytes_read], BUFFER_SIZE - bytes_read, 0)) > 0)
+    while ((n = recv (fd, &buf[bytes_read], BUFFER_SIZE - bytes_read, 0)) > 0)
     {
         bytes_read += n;
         total_data += n;
