@@ -261,7 +261,7 @@ void EpollServer::incoming_connection()
     struct sockaddr_in remote_addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
 
-    while((fd_new = accept4(fd_server, (struct sockaddr*)&remote_addr, &addr_size, SOCK_NONBLOCK)) != -1)
+    if((fd_new = accept4(fd_server, (struct sockaddr*)&remote_addr, &addr_size, SOCK_NONBLOCK)) != -1)
     {
         event.data.fd = fd_new;
 
