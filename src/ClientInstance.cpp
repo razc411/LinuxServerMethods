@@ -97,7 +97,7 @@ void send_echo(int sd, int data_size, std::ofstream * clientlog)
 
 	milliseconds = get_elapsed_time(start_time);
 
-	*clientlog <<<< data_size << "," << milliseconds << std::endl;
+	*clientlog << data_size << "," << milliseconds << std::endl;
 }
 
 /**

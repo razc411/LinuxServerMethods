@@ -31,7 +31,7 @@
 class EpollServer
 {
     public:
-        EpollServer(int s_port, int threads, std::ofstream * log);
+        EpollServer(int s_port, int threads, std::ofstream * log, int type);
         ~EpollServer();
         void monitor_connections(int type);
 

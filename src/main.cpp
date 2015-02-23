@@ -28,7 +28,6 @@
 *       w - runs the level triggered non threaded server.
 *       l - runs the level triggered threaded server.
 *       C - runs the client.
-*       ? - runs the help 
 */
 int main(int argc, char ** argv)
 {
@@ -43,19 +42,6 @@ int main(int argc, char ** argv)
     {
         switch(c)
         {
-            case '?':
-        cout << "*       p <port>        - port for the server to be established on or the client to send to.     DEFAULT: 5001\n
-                *       t <num threads> - number of threads for the threaded servers to run on.                  DEFAULT: 4\n
-                *       h <hostname>    - host to send data to for the client.                                   DEFAULT: LOCALHOST\n
-                *       d <data size>   - the amount of data in bytes for each client to send.                   DEFAULT: 1000000\n
-                *       c <num clients> - the number of clients to create :                                      DEFAULT: 1\n\n
-                *       
-                *       1 of these arguments is required to run\n
-                *       e - runs the edge triggered threaded server.\n
-                *       w - runs the level triggered non threaded server.\n
-                *       l - runs the level triggered threaded server.\n
-                *       C - runs the client."
-                break;
             case 'p':
                 port = atoi(optarg);
                 break;
@@ -95,15 +81,15 @@ int main(int argc, char ** argv)
     switch(type)
     {
         case EDGE_SERVER:
-            eServer = new EpollServer(port, threads, &server_log);
+            eServer = new EpollServer(port, threads, &server_log, type);
             eServer->monitor_connections(EDGE_SERVER);
             break;
         case LEVEL_SERVER:
-            eServer = new EpollServer(port, threads, &server_log);
+            eServer = new EpollServer(port, threads, &server_log, type);
             eServer->monitor_connections(LEVEL_SERVER);
             break;
         case LEVEL_SERVER_NO_THREAD:
-            eServer = new EpollServer(port, threads, &server_log);
+            eServer = new EpollServer(port, threads, &server_log, type);
             eServer->monitor_connections(LEVEL_SERVER_NO_THREAD);
             break;
         case CLIENT:
