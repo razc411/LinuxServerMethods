@@ -162,10 +162,12 @@ void EpollServer::monitor_connections(int type)
 
         for (int i = 0; i < num_fds; i++)
         {
+            if(events[i].events & EPOLLIN){
+                if (events[i].data.fd == fd_server)
+                {
+                    incoming_connection();
+                }
 
-            if (events[i].data.fd == fd_server)
-            {
-                incoming_connection();
                 continue;
             }
 
