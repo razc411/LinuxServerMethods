@@ -71,16 +71,15 @@ EpollServer::~EpollServer()
 void incoming_data(int fd, std::ofstream * server_log)
 {
     int	n, total_data = 0, bytes_read = 0;
-	char *bp, buf[BUFFER_SIZE];
+	char buf[BUFFER_SIZE];
     sockaddr_in remote_addr;
     socklen_t address_len = sizeof(struct sockaddr_in);
 
     memset(buf, 0, BUFFER_SIZE);
     bp = buf;
 
-    while ((n = recv (fd, bp, BUFFER_SIZE - bytes_read, 0)) > 0)
+    while ((n = recv (fd, buf[bytes_read], BUFFER_SIZE - bytes_read, 0)) > 0)
     {
-        bp += n;
         bytes_read += n;
         total_data += n;
 
@@ -88,7 +87,6 @@ void incoming_data(int fd, std::ofstream * server_log)
         {
             send (fd, buf, bytes_read, 0);
             bytes_read = 0;
-            bp = buf;
         }
     }
     if(n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
