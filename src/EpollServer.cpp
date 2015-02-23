@@ -39,7 +39,7 @@ int total_data_read = 0;
 EpollServer::EpollServer(int s_port, int threads, std::ofstream * log, int type) : port(s_port), server_log(log)
 {
     fd_server = create_listener();
-    
+    event = {0};
     if(type != LEVEL_SERVER_NO_THREAD)
     {
         pool = new ThreadPool(threads);
@@ -168,6 +168,11 @@ void EpollServer::monitor_connections(int type)
                     incoming_connection();
                 }
 
+                if(errno != EAGAIN || errno != EWOULDBLOCK)
+                {
+                    callError("Error on accept.");
+                }
+
                 continue;
             }
 
@@ -256,13 +261,12 @@ void EpollServer::incoming_connection()
     struct sockaddr_in remote_addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
 
-    while((fd_new = accept4(fd_server, (struct sockaddr*)&remote_addr, &addr_size, SOCK_NONBLOCK)) == -1)
+    while((fd_new = accept4(fd_server, (struct sockaddr*)&remote_addr, &addr_size, SOCK_NONBLOCK)) != -1)
     {
         event.data.fd = fd_new;
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd_new, &event) == -1)
         {
-            printf("%d", errno);
             callError("epoll_ctl new incoming");
         }
     }
