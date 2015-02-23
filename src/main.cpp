@@ -82,7 +82,6 @@ int main(int argc, char ** argv)
             break;
         case CLIENT:
             Client echo_client(port, hostname, clients, data_size);
-            echo_client.connect_clients(port, hostname, data_size);
             break;
     }
 

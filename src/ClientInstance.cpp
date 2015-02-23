@@ -52,7 +52,7 @@ int start_instance(int port, std::string host)
 *	Core monitoring function of the epoll server. Sets the server up and checks the epoll events for socket events
 *   and responds accordingly. Manages listening, reading and writing.
 */	
-void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * clientlog)
+void send_echo(int sd, int data_size, std::ofstream * clientlog)
 {
     char * bp;
     struct timeval start_time;

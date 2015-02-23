@@ -22,7 +22,7 @@
 #include <cstdlib>
 
 int start_instance(int port, std::string host);
-void send_echo(int sd, int data_size, std::mutex * m_log, std::ofstream * clientlog);
+void send_echo(int sd, int data_size, std::ofstream * clientlog);
 long get_elapsed_time(struct timeval start);
 
 #endif // INSTANCE_H

@@ -18,13 +18,13 @@ class Client
     public:
         Client(int, std::string, int, int); 
         ~Client() {}
-        void connect_clients(int port, std::string hostname, int data_size);
+        void connect_clients(int port, std::string hostname);
         void start_clients();
 
     private:
     	int clients;
+    	int dsize;
         std::string hostname;
-        std::vector<std::thread *> client_list;
 };
 
 #endif // CLIENT_H
